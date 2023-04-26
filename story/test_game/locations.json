@@ -1,7 +1,7 @@
 {
     "start-location": {
         "name": "start-location",
-        "connections": ["test-location-2"],
+        "connections": ["test-location-1"],
         "description": "start-description",
         "changes": [],
         "story": "start-story"

@@ -2,8 +2,8 @@
     "start-location": {
         "name": "start-location",
         "connections": [],
-        "description": "You find yourself in a dimly lit, abandoned warehouse. The sound of dripping water echoes through the vast, open space. The room is filled with scattered crates, rusty machinery, and discarded construction materials. In the center of the room, you see a ticking bomb attached to a large support column, its LED display counting down from 10 minutes.",
+        "description": "THe warehouse is dimly lit, and it appears abandoned. The sound of dripping water echoes through the vast, open space. The room is filled with scattered crates, rusty machinery, and discarded construction materials. Several crates stamped \"STMP\" lay empty, the dangerous materials they once contained spread throughout the city. In the center of the room, there is a ticking bomb attached to a large support column, its LED display counting down from 10 minutes.",
         "changes": [],
-        "story": "You're a secret agent, captured by a nefarious organization, seeking to bring chaos to the city. You woke up in this abandoned warehouse, and you have 10 minutes to defuse the bomb and escape before it detonates. Use your resourcefulness and wit to succeed in this mission."
+        "story": "The player is a secret agent, captured by the nefarious organization STMP seeking to bring chaos to the city. Their name is Bint McGumbo, and this isn't the first sticky situation they've been in. STMP captured them in a humorous manner to be described by the player, and they're tied to some type of industrial machinery. They have 10 minutes to defuse the bomb or escape before it detonates. To survive, the player must use their wits and skills to stop the deadly plan."
     }
 }

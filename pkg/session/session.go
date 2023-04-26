@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"regexp"
 	"sync"
 )
 
@@ -68,18 +67,6 @@ func loadLocations(f string) map[string]Location {
 	return *l
 }
 
-func (s *Session) SetLocation(input string) (Location, error) {
-	s.Lock()
-	defer s.Unlock()
-
-	if l, ok := s.Locations[input]; ok {
-		s.CurrentLocation = input
-		return l, nil
-	}
-
-	return Location{}, fmt.Errorf("location %s not in map: Move action only accepts location names from the current location connections", input)
-}
-
 func (s *Session) GetInventory() Inventory {
 	s.Lock()
 	defer s.Unlock()
@@ -109,24 +96,22 @@ func (s *Session) GetLocation(input string) (Location, error) {
 	return s.Locations[input], nil
 }
 
-func (s *Session) AddLocationChange(input string) (Location, error) {
-	re := regexp.MustCompile(`^([a-z0-9\-]+): (.*)$`)
-	m := re.FindAllStringSubmatch(input, 1)
-	if len(m) != 1 || len(m[0]) != 3 {
-		return Location{}, fmt.Errorf("input `%s` did not match format: `location: description of change`", input)
-	}
-
-	match := m[0]
-	loc := match[1]
-
+func (s *Session) SetLocation(l Location) Location {
 	s.Lock()
-	if v, ok := s.Locations[loc]; ok {
-		v.Changes = append(s.Locations[loc].Changes, match[2])
-		s.Locations[loc] = v
+	defer s.Unlock()
 
-		s.Unlock()
-		return s.GetLocation(loc)
+	s.Locations[l.Name] = l
+	return l
+}
+
+func (s *Session) MoveLocation(input string) (Location, error) {
+	s.Lock()
+	defer s.Unlock()
+
+	if l, ok := s.Locations[input]; ok {
+		s.CurrentLocation = input
+		return l, nil
 	}
 
-	return Location{}, fmt.Errorf("location %s not in map: only use location names that you know exist", loc)
+	return Location{}, fmt.Errorf("location %s not in map: Move action only accepts location names from the current location connections", input)
 }

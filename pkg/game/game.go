@@ -49,3 +49,15 @@ func (e *Engine) GetSession(uuid string) (*session.Session, error) {
 
 	return nil, fmt.Errorf("could not find session ID %s", uuid)
 }
+
+func (e *Engine) EndSession(uuid string) error {
+	e.Lock()
+	defer e.Unlock()
+
+	if _, ok := e.Sessions[uuid]; ok {
+		delete(e.Sessions, uuid)
+		return nil
+	}
+
+	return fmt.Errorf("could not find session ID %s", uuid)
+}

@@ -7,30 +7,29 @@ import (
 	"github.com/dtimm/roomalone-plugin/pkg/session"
 )
 
-// const (
-// 	startLocation = `{
-//         "name": "start-location",
-//         "connections": ["test-location-2"],
-//         "description": "start-description",
-//         "changes": [],
-//         "story": "start-story"
-//     }`
-// 	testLocation = `{
-// 		"name": "test-location-1",
-// 		"connections": ["start-location"],
-// 		"description": "test-description-1",
-// 		"changes": [],
-// 		"story": "test-story-1"
-// 	}`
-// 	testLocationWithChanges = `{
-// 		"name": "test-location-1",
-// 		"connections": ["start-location"],
-// 		"description": "test-description-1",
-// 		"changes": ["test-change-1"],
-// 		"story": "test-story-1"
-// 	}`
-// 	testInventory = `{"items":["test-item-1","test-item-2"]}`
-// )
+var (
+	startLocation = session.Location{
+		Name:        "start-location",
+		Connections: []string{"test-location-1"},
+		Description: "start-description",
+		Changes:     []string{},
+		Story:       "start-story",
+	}
+	testLocation = session.Location{
+		Name:        "test-location-1",
+		Connections: []string{"start-location"},
+		Description: "test-description-1",
+		Changes:     []string{},
+		Story:       "test-story-1",
+	}
+	testLocationUpdated = session.Location{
+		Name:        "test-location-1",
+		Connections: []string{"start-location"},
+		Description: "lo! the description has changed!",
+		Changes:     []string{},
+		Story:       "test-story-1",
+	}
+)
 
 var _ = Describe("Session", func() {
 	var testSession *session.Session
@@ -49,47 +48,46 @@ var _ = Describe("Session", func() {
 		})
 	})
 
-	Describe("SetLocation", func() {
-		// Context("when moving to an existing location", func() {
-		// 	It("returns the new location information", func() {
-		// 		m, err := testSession.SetLocation("test-location-1")
+	Describe("MoveLocation", func() {
+		Context("when moving to an existing location", func() {
+			It("returns the new location information", func() {
+				m, err := testSession.MoveLocation("test-location-1")
 
-		// 		Expect(err).ToNot(HaveOccurred())
-		// 		Expect(m.Role).To(Equal(openai.ChatMessageRoleUser))
-		// 		Expect(m.Content).To(MatchJSON(testLocation))
-		// 	})
-		// })
+				Expect(err).ToNot(HaveOccurred())
+				Expect(m).To(BeEquivalentTo(testLocation))
+
+				Expect(testSession.CurrentLocation).To(Equal("test-location-1"))
+			})
+		})
 
 		Context("with an invalid location", func() {
 			It("returns an error", func() {
-				_, err := testSession.SetLocation("fake-location")
+				_, err := testSession.MoveLocation("fake-location")
 
-				Expect(testSession.CurrentLocation).To(Equal("start-location"))
 				Expect(err).To(MatchError("location fake-location not in map: Move action only accepts location names from the current location connections"))
+				Expect(testSession.CurrentLocation).To(Equal("start-location"))
 			})
 		})
 	})
 
 	Describe("GetLocation", func() {
-		// Context("with empty input", func() {
-		// 	It("returns the current location information", func() {
-		// 		l, err := testSession.GetLocation("")
+		Context("with empty input", func() {
+			It("returns the current location information", func() {
+				l, err := testSession.GetLocation("")
 
-		// 		Expect(err).ToNot(HaveOccurred())
-		// 		Expect(l.Role).To(Equal(openai.ChatMessageRoleUser))
-		// 		Expect(l.Content).To(MatchJSON(startLocation))
-		// 	})
-		// })
+				Expect(err).ToNot(HaveOccurred())
+				Expect(l).To(BeEquivalentTo(startLocation))
+			})
+		})
 
-		// Context("with an existing location", func() {
-		// 	It("returns the location information", func() {
-		// 		l, err := testSession.GetLocation("test-location-1")
+		Context("with an existing location", func() {
+			It("returns the location information", func() {
+				l, err := testSession.GetLocation("test-location-1")
 
-		// 		Expect(err).ToNot(HaveOccurred())
-		// 		Expect(l.Role).To(Equal(openai.ChatMessageRoleUser))
-		// 		Expect(l.Content).To(MatchJSON(testLocation))
-		// 	})
-		// })
+				Expect(err).ToNot(HaveOccurred())
+				Expect(l).To(BeEquivalentTo(testLocation))
+			})
+		})
 
 		Context("with an invalid location", func() {
 			It("returns an error", func() {
@@ -100,30 +98,33 @@ var _ = Describe("Session", func() {
 		})
 	})
 
-	Describe("AddLocationChange", func() {
-		// Context("with an existing location", func() {
-		// 	It("returns the updated location information", func() {
-		// 		l, err := testSession.AddLocationChange("test-location-1: test-change-1")
+	Describe("SetLocation", func() {
+		Context("with an existing location", func() {
+			It("returns the updated location information", func() {
+				Expect(testSession.GetLocation("test-location-1")).To(BeEquivalentTo(testLocation))
 
-		// 		Expect(err).ToNot(HaveOccurred())
-		// 		Expect(l.Role).To(Equal(openai.ChatMessageRoleUser))
-		// 		Expect(l.Content).To(MatchJSON(testLocationWithChanges))
-		// 	})
-		// })
+				l := testSession.SetLocation(testLocationUpdated)
 
-		Context("with an invalid location", func() {
-			It("returns an error", func() {
-				_, err := testSession.AddLocationChange("fake-location: test-change-1")
-
-				Expect(err).To(MatchError("location fake-location not in map: only use location names that you know exist"))
+				Expect(l).To(BeEquivalentTo(testLocationUpdated))
+				Expect(testSession.GetLocation("test-location-1")).To(BeEquivalentTo(testLocationUpdated))
 			})
 		})
 
-		Context("with incorrectly formatted input", func() {
-			It("returns an error", func() {
-				_, err := testSession.AddLocationChange("add a change to fake-location")
+		Context("with a new location", func() {
+			newLocation := session.Location{
+				Name:        "new-location",
+				Connections: []string{"start-location"},
+				Description: "new-description",
+				Changes:     []string{},
+				Story:       "new-story",
+			}
+			It("creates the location", func() {
+				Expect(testSession.GetLocation("new-location")).Error().To(HaveOccurred())
 
-				Expect(err).To(MatchError("input `add a change to fake-location` did not match format: `location: description of change`"))
+				l := testSession.SetLocation(newLocation)
+
+				Expect(l).To(BeEquivalentTo(newLocation))
+				Expect(testSession.GetLocation("new-location")).To(BeEquivalentTo(newLocation))
 			})
 		})
 	})

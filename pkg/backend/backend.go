@@ -20,17 +20,36 @@ type MoveRequest struct {
 	Location string `json:"location"`
 }
 
-func (g *GameBackend) HandleInventory(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	guid := vars["session_guid"]
+type handlerFuncWithSession func(w http.ResponseWriter, r *http.Request, s *session.Session)
 
-	s, err := g.GetSession(guid)
+func (g *GameBackend) HandleWithSession(h handlerFuncWithSession) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		guid := vars["session_guid"]
+
+		s, err := g.GetSession(guid)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error getting session: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		h(w, r, s)
+	}
+}
+
+func (g *GameBackend) Debug(w http.ResponseWriter, r *http.Request, s *session.Session) {
+	b, err := json.Marshal(s)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error getting session: %s", err)
+		fmt.Fprintf(os.Stderr, "error marshalling response body: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	w.Write(b)
+}
+
+func (g *GameBackend) Inventory(w http.ResponseWriter, r *http.Request, s *session.Session) {
 	if r.Method == "POST" {
 		defer r.Body.Close()
 		body, err := ioutil.ReadAll(r.Body)
@@ -60,35 +79,19 @@ func (g *GameBackend) HandleInventory(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
-func (g *GameBackend) HandleLocation(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	guid := vars["session_guid"]
-
-	s, err := g.GetSession(guid)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error getting session: %s", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+func (g *GameBackend) Location(w http.ResponseWriter, r *http.Request, s *session.Session) {
+	var err error
+	var l session.Location
 
 	switch r.Method {
-	case "GET":
-		l, err := s.GetLocation("")
+	case http.MethodGet:
+		l, err = s.GetLocation("")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error getting location: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
-		b, err := json.Marshal(l)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error marshalling response body: %s", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		w.Write(b)
-	case "POST":
+	case http.MethodPut:
 		defer r.Body.Close()
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -96,6 +99,25 @@ func (g *GameBackend) HandleLocation(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		req := session.Location{}
+		err = json.Unmarshal(body, &req)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error unmarshalling request body: %s, body: %s", err, body)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		l = s.SetLocation(req)
+	case http.MethodPost:
+		defer r.Body.Close()
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error reading request body: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		req := MoveRequest{}
 		err = json.Unmarshal(body, &req)
 		if err != nil {
@@ -104,22 +126,36 @@ func (g *GameBackend) HandleLocation(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		l, err := s.SetLocation(req.Location)
+		l, err = s.MoveLocation(req.Location)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error setting location: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
-		b, err := json.Marshal(l)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error marshalling response body: %s", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		w.Write(b)
 	}
+
+	b, err := json.Marshal(l)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error marshalling response body: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(b)
+}
+
+func (g *GameBackend) HandleEnd(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	guid := vars["session_guid"]
+
+	err := g.EndSession(guid)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error getting session: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 type NewSessionRequest struct {

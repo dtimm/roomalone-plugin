@@ -10,16 +10,28 @@ import (
 	"github.com/dtimm/roomalone-plugin/pkg/game"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
+	"github.com/vito/go-flags"
 )
 
+type options struct {
+	Debug bool `short:"d" long:"debug" description:"Allow debug endpoints"`
+}
+
 func main() {
+	var opt options
+	flags.Parse(&opt)
+
 	g := game.New()
 	b := backend.New(g)
 
 	r := mux.NewRouter()
+	if opt.Debug {
+		r.HandleFunc("/debug/{session_guid}", b.HandleWithSession(b.Debug)).Methods("GET")
+	}
 	r.HandleFunc("/new_session", b.HandleNewSession).Methods("POST")
-	r.HandleFunc("/inventory/{session_guid}", b.HandleInventory).Methods("GET", "POST")
-	r.HandleFunc("/location/{session_guid}", b.HandleLocation).Methods("GET", "POST")
+	r.HandleFunc("/inventory/{session_guid}", b.HandleWithSession(b.Inventory)).Methods("GET", "POST")
+	r.HandleFunc("/location/{session_guid}", b.HandleWithSession(b.Location)).Methods("GET", "POST")
+	r.HandleFunc("/end_session/{session_guid}", b.HandleEnd).Methods("GET")
 
 	r.PathPrefix("/.well-known/ai-plugin.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Serving ai-plugin.json to someone!\n")
