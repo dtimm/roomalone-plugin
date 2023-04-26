@@ -10,14 +10,12 @@ import (
 )
 
 type Engine struct {
-	LogFile  string
 	Sessions map[string]*session.Session
 	*sync.Mutex
 }
 
 func New() *Engine {
 	return &Engine{
-		LogFile:  "log.txt",
 		Sessions: map[string]*session.Session{},
 		Mutex:    &sync.Mutex{},
 	}
@@ -50,22 +48,4 @@ func (e *Engine) GetSession(uuid string) (*session.Session, error) {
 	}
 
 	return nil, fmt.Errorf("could not find session ID %s", uuid)
-}
-
-type Action string
-
-const (
-	InventoryAction Action = "Inventory"
-	UpdateInvAction Action = "Update Inventory"
-	MoveAction      Action = "Move"
-	LocationAction  Action = "Location"
-	UpdateLocAction Action = "Update Location"
-	PromptAction    Action = "Prompt"
-	WinAction       Action = "Win"
-)
-
-type GameAgentAction struct {
-	Thought string `json:"thought"`
-	Action  Action `json:"action"`
-	Input   string `json:"input"`
 }

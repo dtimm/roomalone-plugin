@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/dtimm/roomalone-plugin/pkg/game"
+	"github.com/dtimm/roomalone-plugin/pkg/session"
 	"github.com/gorilla/mux"
 )
 
@@ -17,6 +18,46 @@ type GameBackend struct {
 
 type MoveRequest struct {
 	Location string `json:"location"`
+}
+
+func (g *GameBackend) HandleInventory(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	guid := vars["session_guid"]
+
+	s, err := g.GetSession(guid)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error getting session: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if r.Method == "POST" {
+		defer r.Body.Close()
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error reading request body: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		i := session.Inventory{}
+		err = json.Unmarshal(body, &i)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error unmarshalling request body: %s, body: %s", err, body)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		s.SetInventory(i.Items)
+	}
+
+	b, err := json.Marshal(s.GetInventory())
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error marshalling response body: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(b)
 }
 
 func (g *GameBackend) HandleLocation(w http.ResponseWriter, r *http.Request) {

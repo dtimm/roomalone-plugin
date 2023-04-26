@@ -24,6 +24,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/newSessionResponse'
 
+  /inventory/{session_guid}:
+    get:
+      operationId: getInventory
+      summary: Get the current player inventory.
+      parameters:
+      - in: path
+        name: session_guid
+        schema:
+          type: string
+        required: true
+        description: The GUID of the game session.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inventory'
+    post:
+      operationId: setInventory
+      summary: Set the session inventory to keep track of items carried or worn.
+      parameters:
+      - in: path
+        name: session_guid
+        schema:
+          type: string
+        required: true
+        description: The GUID of the game session.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/inventory'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inventory'
+
   /location/{session_guid}:
     get:
       operationId: getLocation
@@ -81,6 +123,11 @@ components:
         session_guid:
           type: string
           description: The GUID of the new session.
+    inventory:
+      type: array
+      items:
+        type: string
+      description: The items in the player's inventory.
     locationResponse:
       type: object
       properties:

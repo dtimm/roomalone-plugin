@@ -18,6 +18,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/new_session", b.HandleNewSession).Methods("POST")
+	r.HandleFunc("/inventory/{session_guid}", b.HandleInventory).Methods("GET", "POST")
 	r.HandleFunc("/location/{session_guid}", b.HandleLocation).Methods("GET", "POST")
 
 	r.PathPrefix("/.well-known/ai-plugin.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
