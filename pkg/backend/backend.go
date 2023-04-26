@@ -15,12 +15,8 @@ type GameBackend struct {
 	*game.Engine
 }
 
-type NewSessionRequest struct {
-	Adventure string `json:"adventure"`
-}
-
-type NewSessionResponse struct {
-	SessionGUID string `json:"session_guid"`
+type MoveRequest struct {
+	Location string `json:"location"`
 }
 
 func (g *GameBackend) HandleLocation(w http.ResponseWriter, r *http.Request) {
@@ -34,21 +30,63 @@ func (g *GameBackend) HandleLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	l, err := s.GetLocation("")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error getting location: %s", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	switch r.Method {
+	case "GET":
+		l, err := s.GetLocation("")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error getting location: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
-	b, err := json.Marshal(l)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error marshalling response body: %s", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+		b, err := json.Marshal(l)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error marshalling response body: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
-	w.Write(b)
+		w.Write(b)
+	case "POST":
+		defer r.Body.Close()
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error reading request body: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		req := MoveRequest{}
+		err = json.Unmarshal(body, &req)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error unmarshalling request body: %s, body: %s", err, body)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		l, err := s.SetLocation(req.Location)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error setting location: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		b, err := json.Marshal(l)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error marshalling response body: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Write(b)
+	}
+}
+
+type NewSessionRequest struct {
+	Adventure string `json:"adventure"`
+}
+
+type NewSessionResponse struct {
+	SessionGUID string `json:"session_guid"`
 }
 
 func (g *GameBackend) HandleNewSession(w http.ResponseWriter, r *http.Request) {
