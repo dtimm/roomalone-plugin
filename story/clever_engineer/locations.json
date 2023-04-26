@@ -1,0 +1,9 @@
+{
+    "start-location": {
+        "name": "start-location",
+        "connections": [],
+        "description": "You find yourself in a dimly lit, abandoned warehouse. The sound of dripping water echoes through the vast, open space. The room is filled with scattered crates, rusty machinery, and discarded construction materials. In the center of the room, you see a ticking bomb attached to a large support column, its LED display counting down from 10 minutes.",
+        "changes": [],
+        "story": "You're a secret agent, captured by a nefarious organization, seeking to bring chaos to the city. You woke up in this abandoned warehouse, and you have 10 minutes to defuse the bomb and escape before it detonates. Use your resourcefulness and wit to succeed in this mission."
+    }
+}

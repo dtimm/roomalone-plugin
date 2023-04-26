@@ -1,0 +1,9 @@
+{
+    "start-location": {
+        "name": "start-location",
+        "connections": [],
+        "description": "The office is cluttered with papers, books, and empty coffee cups. A large window overlooks the busy street outside, but it's sealed shut. The walls are adorned with pictures of past cases and a diploma from a detective academy. There's a locked door, the only exit, with an electronic keypad requiring a code. A sturdy wooden desk occupies the center of the room, supporting a computer, a phone, and a small safe with a combination lock. A tall bookshelf crammed with books and trinkets stands against the opposite wall. A note on the desk reads: 'Remember, the key to freedom is hidden in the past.' A fedora [brown, +1 Cool] and a tan trench coat [+2 Cool] hang on a coat rack near the door.",
+        "changes": [],
+        "story": "The player wakes up here with a bad hangover. They are Charlie Noir, a private investigator. After solving a high-profile case, a rival with a grudge has locked them inside their own office. To escape, the player must use their wits and skills to uncover hidden clues, decipher riddles, and unlock the door before the rival's dangerous plan unfolds. Along the way, the player will uncover secrets from past cases that hold the key to their freedom."
+    }
+}

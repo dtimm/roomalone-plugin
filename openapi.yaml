@@ -1,93 +1,109 @@
 openapi: 3.0.1
 info:
-  title: TODO Plugin
-  description: A plugin that allows the user to create and manage a TODO list using ChatGPT. If you do not know the user's username, ask them first before making queries to the plugin. Otherwise, use the username "global".
+  title: RoomAlone
+  description: A plugin that allows the user to play games of RoomAlone with ChatGPT. The game session is identified with a GUID, which is returned by the plugin when the game is started. The user can then use the GUID to continue the game later.
   version: 'v1'
 servers:
-  - url: http://localhost:5003
+  - url: http://localhost:8080
 paths:
-  /todos/{username}:
-    get:
-      operationId: getTodos
-      summary: Get the list of todos
-      parameters:
-      - in: path
-        name: username
-        schema:
-            type: string
+  /new_session:
+    post:
+      operationId: newSession
+      summary: Start a new session.
+      requestBody:
         required: true
-        description: The name of the user.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/newSessionRequest'
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getTodosResponse'
+                $ref: '#/components/schemas/newSessionResponse'
+
+  /location/{session_guid}:
+    parameters:
+    - in: path
+      name: session_guid
+      schema:
+        type: string
+      required: true
+      description: The GUID of the game session.
+    get:
+      operationId: getLocation
+      summary: Get a description of the current location.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/locationResponse'
     post:
-      operationId: addTodo
-      summary: Add a todo to the list
-      parameters:
-      - in: path
-        name: username
-        schema:
-            type: string
-        required: true
-        description: The name of the user.
+      operationId: move
+      summary: Move the player to a new location.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/addTodoRequest'
+              $ref: '#/components/schemas/moveRequest'
       responses:
         "200":
           description: OK
-    delete:
-      operationId: deleteTodo
-      summary: Delete a todo from the list
-      parameters:
-      - in: path
-        name: username
-        schema:
-            type: string
-        required: true
-        description: The name of the user.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/deleteTodoRequest'
-      responses:
-        "200":
-          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/locationResponse'
 
 components:
   schemas:
-    getTodosResponse:
+    newSessionRequest:
       type: object
       properties:
-        todos:
+        adventure:
+          type: string
+          description: The name of the adventure to play. Options are charlie_noir and clever_engineer.
+          required: true
+    newSessionResponse:
+      type: object
+      properties:
+        session_guid:
+          type: string
+          description: The GUID of the new session.
+    locationResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the location
+        connections:
           type: array
           items:
             type: string
-          description: The list of todos.
-    addTodoRequest:
-      type: object
-      required:
-      - todo
-      properties:
-        todo:
+          description: The names of the locations that can be reached from this location.
+        description:
           type: string
-          description: The todo to add to the list.
-          required: true
-    deleteTodoRequest:
+          description: The description of the location.
+        changes:
+          type: array
+          items:
+            type: string
+          description: The changes that the player has made to the location in this session.
+        story:
+          type: array
+          items:
+            type: string
+          description: The story elements associated with the location. This may include plot points, items, and other elements.
+    moveRequest:
       type: object
       required:
-      - todo_idx
+      - location
       properties:
-        todo_idx:
-          type: integer
-          description: The index of the todo to delete.
+        location:
+          type: string
+          description: The name of the new location.
           required: true

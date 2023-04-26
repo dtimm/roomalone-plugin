@@ -1,0 +1,16 @@
+{
+    "start-location": {
+        "name": "start-location",
+        "connections": ["test-location-2"],
+        "description": "start-description",
+        "changes": [],
+        "story": "start-story"
+    },
+    "test-location-1": {
+        "name": "test-location-1",
+        "connections": ["start-location"],
+        "description": "test-description-1",
+        "changes": [],
+        "story": "test-story-1"
+    }
+}
