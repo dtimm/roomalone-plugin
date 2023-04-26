@@ -25,16 +25,16 @@ paths:
                 $ref: '#/components/schemas/newSessionResponse'
 
   /location/{session_guid}:
-    parameters:
-    - in: path
-      name: session_guid
-      schema:
-        type: string
-      required: true
-      description: The GUID of the game session.
     get:
       operationId: getLocation
       summary: Get a description of the current location.
+      parameters:
+      - in: path
+        name: session_guid
+        schema:
+          type: string
+        required: true
+        description: The GUID of the game session.
       responses:
         "200":
           description: OK
@@ -45,6 +45,13 @@ paths:
     post:
       operationId: move
       summary: Move the player to a new location.
+      parameters:
+      - in: path
+        name: session_guid
+        schema:
+          type: string
+        required: true
+        description: The GUID of the game session.
       requestBody:
         required: true
         content:
