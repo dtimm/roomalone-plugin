@@ -59,7 +59,7 @@ paths:
                 $ref: '#/components/schemas/inventory'
     post:
       operationId: setInventory
-      summary: Set the session inventory to keep track of items carried or worn.
+      summary: Set the full session inventory to keep track of items carried or worn.
       parameters:
       - in: path
         name: session_guid
@@ -110,11 +110,11 @@ paths:
         required: true
         description: The GUID of the game session.
       requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/location'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/location'
       responses:
         "200":
           description: OK
@@ -162,10 +162,13 @@ components:
           type: string
           description: The GUID of the new session.
     inventory:
-      type: array
-      items:
-        type: string
-      description: The items in the player's inventory.
+      type: object
+      properties:
+        items:
+          type: array
+          description: The individual items in the player's inventory.
+          items:
+            type: string
     location:
       type: object
       properties:
