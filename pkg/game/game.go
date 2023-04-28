@@ -30,7 +30,6 @@ func (e *Engine) NewSession(game string) string {
 
 	e.Sessions[u.String()] = g
 
-	fmt.Printf("system: created new session: %s\n\tcurrent location: %s\n", u.String(), g.CurrentLocation)
 	return u.String()
 }
 

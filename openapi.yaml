@@ -99,9 +99,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/location'
-    put:
+    patch:
       operationId: setLocation
-      summary: Create or update a full location description.
+      summary: Create or update a location with changes made in the course of the game.
       parameters:
       - in: path
         name: session_guid
@@ -114,7 +114,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/location'
+              $ref: '#/components/schemas/locationUpdate'
       responses:
         "200":
           description: OK
@@ -193,6 +193,17 @@ components:
           items:
             type: string
           description: The story elements associated with the location. This may include plot points, items, and other elements.
+    locationUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the location
+        changes:
+          type: array
+          items:
+            type: string
+          description: The changes that the player has made to the location in this session.
     moveRequest:
       type: object
       required:

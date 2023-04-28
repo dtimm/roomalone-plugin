@@ -100,7 +100,10 @@ func (s *Session) SetLocation(l Location) Location {
 	s.Lock()
 	defer s.Unlock()
 
-	s.Locations[l.Name] = l
+	updatedLocation := s.Locations[l.Name]
+	updatedLocation.Changes = append(updatedLocation.Changes, l.Changes...)
+
+	s.Locations[l.Name] = updatedLocation
 	return l
 }
 

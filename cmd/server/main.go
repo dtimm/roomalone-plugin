@@ -26,6 +26,7 @@ func main() {
 
 	r := mux.NewRouter()
 	if opt.Debug {
+		b.PrintDebug = true
 		r.HandleFunc("/debug/{session_guid}", b.HandleWithSession(b.Debug)).Methods("GET")
 	}
 	r.HandleFunc("/new_session", b.HandleNewSession).Methods("POST")

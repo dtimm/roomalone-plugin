@@ -14,10 +14,7 @@ import (
 
 type GameBackend struct {
 	*game.Engine
-}
-
-type MoveRequest struct {
-	Location string `json:"location"`
+	PrintDebug bool
 }
 
 type handlerFuncWithSession func(w http.ResponseWriter, r *http.Request, s *session.Session)
@@ -26,6 +23,12 @@ func (g *GameBackend) HandleWithSession(h handlerFuncWithSession) http.HandlerFu
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		guid := vars["session_guid"]
+
+		if g.PrintDebug {
+			fmt.Printf("req url: %s\n", r.URL)
+			fmt.Printf("req method: %s\n", r.Method)
+			fmt.Printf("req body: %s\n", r.Body)
+		}
 
 		s, err := g.GetSession(guid)
 		if err != nil {
@@ -76,7 +79,15 @@ func (g *GameBackend) Inventory(w http.ResponseWriter, r *http.Request, s *sessi
 		return
 	}
 
+	if g.PrintDebug {
+		fmt.Printf("inventory: %s\n", string(b))
+	}
+
 	w.Write(b)
+}
+
+type MoveRequest struct {
+	Location string `json:"location"`
 }
 
 func (g *GameBackend) Location(w http.ResponseWriter, r *http.Request, s *session.Session) {
@@ -91,7 +102,7 @@ func (g *GameBackend) Location(w http.ResponseWriter, r *http.Request, s *sessio
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-	case http.MethodPut:
+	case http.MethodPatch:
 		defer r.Body.Close()
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -141,6 +152,10 @@ func (g *GameBackend) Location(w http.ResponseWriter, r *http.Request, s *sessio
 		return
 	}
 
+	if g.PrintDebug {
+		fmt.Printf("location: %s\n", string(b))
+	}
+
 	w.Write(b)
 }
 
@@ -153,6 +168,10 @@ func (g *GameBackend) HandleEnd(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(os.Stderr, "error getting session: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+
+	if g.PrintDebug {
+		fmt.Printf("session ended: %s\n", guid)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -192,6 +211,10 @@ func (g *GameBackend) HandleNewSession(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(os.Stderr, "error marshalling response body: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+
+	if g.PrintDebug {
+		fmt.Printf("new session: %s\n", string(b))
 	}
 
 	w.Write(b)
