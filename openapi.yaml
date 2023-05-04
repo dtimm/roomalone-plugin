@@ -101,7 +101,7 @@ paths:
                 $ref: '#/components/schemas/location'
     patch:
       operationId: setLocation
-      summary: Create or update a location with changes made in the course of the game.
+      summary: Update a location with meaningful changes that alter the location permanently, e.g. picked up items, broken things, etc.
       parameters:
       - in: path
         name: session_guid

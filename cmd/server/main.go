@@ -47,6 +47,15 @@ func main() {
 		http.ServeFile(w, r, "logo.png")
 	})
 
+	if opt.Debug {
+		r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			fmt.Printf("req url: %s\n", req.URL)
+			fmt.Printf("req method: %s\n", req.Method)
+			fmt.Printf("req body: %s\n", req.Body)
+			w.WriteHeader(http.StatusBadRequest)
+		})
+	}
+
 	cr := cors.New(cors.Options{
 		AllowedOrigins: []string{"https://chat.openai.com"},
 		AllowedMethods: []string{"GET", "POST"},
