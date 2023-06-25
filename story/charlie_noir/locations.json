@@ -1,9 +1,30 @@
 {
     "start-location": {
         "name": "start-location",
-        "connections": [],
+        "connections": ["streets"],
         "description": "The office is cluttered with papers, books, and empty coffee cups. A large window overlooks the busy street outside, but it's sealed shut. The walls are adorned with pictures of past cases and a diploma from a detective academy. There's a locked door, the only exit, with an electronic keypad requiring a code. A sturdy wooden desk occupies the center of the room, supporting a computer, a phone, and a small safe with a combination lock. A tall bookshelf crammed with books and trinkets stands against the opposite wall. A note on the desk reads: 'Remember, the key to freedom is hidden in the past.' A fedora [brown, +1 Cool] and a tan trench coat [+2 Cool] hang on a coat rack near the door.",
         "changes": [],
         "story": "The player wakes up here with a bad hangover. They are Charlie Noir, a private investigator. After solving a high-profile case, a rival with a grudge has locked them inside their own office. To escape, the player must use their wits and skills to uncover hidden clues, decipher riddles, and unlock the door before the rival's dangerous plan unfolds. Along the way, the player will uncover secrets from past cases that hold the key to their freedom."
+    },
+    "streets": {
+        "name": "streets",
+        "connections": ["start-location", "bar", "warehouse", "alley", "police-station", "pawn-shop", "diner", "apartments", "train-station", "harbor"],
+        "description": "The streets of the business district are slick with rain, the neon lights of the surrounding buildings reflecting off the wet asphalt. The area is eerily quiet, the usual hustle and bustle replaced by an unsettling silence. The buildings here are old and rundown, their once vibrant facades now faded and peeling. A constant drizzle adds to the gloomy atmosphere. The streets lead in several directions, each one promising its own set of dangers and opportunities.",
+        "changes": [],
+        "story": "After escaping his office, Charlie Noir finds himself in the heart of the city's grimy business district. The streets, once bustling with activity, now stand as a silent testament to the city's darker side. It's here that Charlie begins his investigation, following leads, uncovering clues, and navigating the dangers of the city's underworld."
+    },
+    "bar": {
+        "name": "bar",
+        "connections": ["streets", "alley"],
+        "description": "The Last Call is a dimly lit bar, filled with the scent of stale beer and old smoke. The worn-out wooden bar counter is manned by a gruff bartender with a scar over his eye, while a few patrons sit hunched over their drinks. A jukebox in the corner plays a melancholic jazz tune, adding to the somber atmosphere. The walls are adorned with faded photographs and old newspaper clippings. A back door leads to a dark alley.",
+        "changes": [],
+        "story": "The Last Call is a place where secrets are traded like currency. If asked about anything, the bartending will warn Charlie to tread carefully. Charlie can learn of a mysterious shipment arriving at an old warehouse from a patron, but they don't know when it is arriving. The warehouse is rumored to be under the control of the city's most notorious gang. The patrons all know that the police in this town are corrupt."
+    },
+    "alley": {
+        "name": "alley",
+        "connections": ["bar", "streets"],
+        "description": "The alley is a narrow, dark passage between two old brick buildings. The ground is wet from the constant drizzle, and the smell of damp trash fills the air. A single dim light flickers at the far end, casting long, eerie shadows. Discarded items and graffiti are scattered along the walls. It's easy to miss important things here, but a keen eye might find something useful.",
+        "changes": [],
+        "story": "There is extensive grafitti on the brick walls of the alley, included a coded message. The message, cryptic and seemingly nonsensical, is a puzzle waiting to be solved. It encodes a time, and the key to unlocking it is known to one of the police officers in the city. It's a dangerous place, but Charlie knows that sometimes, the most important clues are hidden in the most unlikely places."
     }
 }
