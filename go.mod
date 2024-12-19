@@ -3,12 +3,12 @@ module github.com/dtimm/roomalone-plugin
 go 1.20
 
 require (
-	github.com/google/uuid v1.3.0
-	github.com/gorilla/mux v1.8.0
+	github.com/google/uuid v1.6.0
+	github.com/gorilla/mux v1.8.1
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.1
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.6
-	github.com/rs/cors v1.9.0
+	github.com/rs/cors v1.11.1
 	github.com/vito/go-flags v1.4.0
 )
 
